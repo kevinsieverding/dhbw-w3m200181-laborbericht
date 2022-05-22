@@ -19,5 +19,6 @@
   "cSpell.words": [
   ],
   "editor.wordWrap": "bounded",
-  "editor.wordWrapColumn": 110
+  "editor.wordWrapColumn": 110,
+  "cSpell.language": "en,de-DE"
 }
