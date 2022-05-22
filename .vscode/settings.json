@@ -15,6 +15,7 @@
       "env": {}
     },
   ],
+  "latex-workshop.latex.autoClean.run": "onBuilt",
   "cSpell.words": [
   ],
   "editor.wordWrap": "bounded",
