@@ -30,7 +30,9 @@
 % setup hyperref after all packages have been loaded
 \hypersetup{
   colorlinks=true,
-  allcolors=black,
+  linkcolor=black,
+  urlcolor=blue,
+  citecolor=black,
 }
 
 % setup acronyms
@@ -82,11 +84,11 @@
 \setlist[description]{leftmargin=!, labelwidth=4em}
 
 \printnoidxglossary[
-    type=\acronymtype,
-    sort=nocase,
-    nogroupskip,
-    nopostdot,
-    nonumberlist
+  type=\acronymtype,
+  sort=nocase,
+  nogroupskip,
+  nopostdot,
+  nonumberlist
 ]
 
 \setlist[description]{style=standard}
@@ -137,7 +139,14 @@
 %   \vfill{}
 % }
 
-% \clearpage
+\clearpage
+
+% print bibliography in sloppypar environment for better URL placement
+\begin{sloppypar}
+  \printbibliography[
+    heading=bibintoc % include bibliography in table of contents
+  ]{}
+\end{sloppypar}
 
 \pagestyle{plain.scrheadings}
 
