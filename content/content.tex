@@ -5,7 +5,10 @@
 Dieser Bericht beschreibt eine Laborarbeit, welche im Rahmen der Vorlesung \enquote{W3M20018.1 Data Science \& Big Data} durchgeführt wurde.\footnote{\href{https://farberg.de/talks/big-data/?01\%20-\%20Introduction.md\#/2}{https://farberg.de/talks/big-data/?01 - Introduction.md\#/2}}
 Gegenstand der Laborarbeit ist die Abwandlung eines vorgegebenen Big Data Setups, um damit einen eigens ausgewählten Use Case abzubilden.\footnote{\href{https://farberg.de/talks/big-data/?06\%20-\%20Use\%20Case.md\#/}{https://farberg.de/talks/big-data/?06 - Use Case.md\#/}}
 Die praktischen Ergebnisse der Arbeit sind im GitHub Repository \href{https://github.com/kevinsieverding/dhbw-w3m200181-app}{kevinsieverding/dhbw-w3m200181-app} zu finden.
-Im Folgenden beschreibt Abschnitt \ref{sec:use-case} den gewählten Use Case, Abschnitt \ref{sec:architektur} die gewählte Architektur und Umsetzung bevor Abschnitt \ref{sec:fazit} ein Fazit darlegt.
+
+Im Folgenden beschreiben Abschnitt \ref{sec:use-case} den gewählten Use Case und Abschnitt \ref{sec:architektur} die gewählte Architektur und Umsetzung.
+Daraufhin legt Abschnitt \ref{sec:funktion} die genaue Funktion der Anwendung im Detail dar.
+Abschnitt \ref{sec:fazit} legt abschließend ein Fazit dar.
 
 \section{Use Case}\label{sec:use-case}
 
@@ -136,4 +139,4 @@ Erstens, könnte die Simulator App durch ein MQTT Gateway ersetzt werden, wodurc
 Zur Veranschaulichung der Funktionalität, könnten schlanke MQTT Clients entwickelt werden, die anstatt Werte zu generieren, Werte aus dem Datensatz von \cite{helwig_condition_2015} über das Gateway in die Anwendung spielen.
 
 Zweitens, ist die Analyse in Spark in der vorliegenden Form wenig \textit{predictive}.
-Um dem Anspruch von Predictive Maintenance näher zu kommen könnten womöglich Funktionen der SparkML Bibliothek verwendet werden, um anhand der Sensorwerte die verbleibende Nutzdauer der Maschine vorherzusagen.
+Um dem Anspruch von Predictive Maintenance näher zu kommen, könnten womöglich Funktionen der SparkML Bibliothek verwendet werden, um anhand der Sensorwerte die verbleibende Nutzdauer der Maschine vorherzusagen.
