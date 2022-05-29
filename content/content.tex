@@ -123,3 +123,17 @@ Diese Nachrichten mit Warnungen über Messwerte, welche die bestimmten Grenzwert
 Die Ergebnisse der dafür notwendigen Datenbankabfragen werden in den Memcached Instanzen für fünf Sekunden zwischengespeichert.
 
 \section{Fazit}\label{sec:fazit}
+
+Die vorgestellte Laborarbeit wandelt die gegebene Anwendung gemäß der Aufgabenstellung ab, um einen unteschiedlichen Big Data Use Case zu implementieren.
+Hierbei widmet sich die entwickelte Anwendung der Analyse von Messwerten von simulierten Temperatursensoren.
+Die Analyse beschränkt sich darauf zu prüfen ob die Messwerte einen festen Grenzwert überschreiten.
+Ist dies der Fall, wird diese Information über Kafka an eine Web-App kommuniziert, welche diese persistiert und über eine API bereitstellt.
+Im Gegensatz zu der ursprünglichen Anwendung, wird die Datenbank exklusiv von der Web-App verwendet.
+Die Spark und Web Apps integrieren ausschließlich über Kafka.
+
+Es präsentieren sich zwei offensichtliche Möglichkeiten zur Weiterentwicklung.
+Erstens, könnte die Simulator App durch ein MQTT Gateway ersetzt werden, wodurch die Architektur den Anforderungen eines realistischeren Form des Use Case besser gerecht werden könnte.
+Zur Veranschaulichung der Funktionalität, könnten schlanke MQTT Clients entwickelt werden, die anstatt Werte zu generieren, Werte aus dem Datensatz von \cite{helwig_condition_2015} über das Gateway in die Anwendung spielen.
+
+Zweitens, ist die Analyse in Spark in der vorliegenden Form wenig \textit{predictive}.
+Um dem Anspruch von Predictive Maintenance näher zu kommen könnten womöglich Funktionen der SparkML Bibliothek verwendet werden, um anhand der Sensorwerte die verbleibende Nutzdauer der Maschine vorherzusagen.
