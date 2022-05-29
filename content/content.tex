@@ -8,11 +8,12 @@ Die praktischen Ergebnisse der Arbeit sind im GitHub Repository \href{https://gi
 
 Im Folgenden beschreiben Abschnitt \ref{sec:use-case} den gewählten Use Case und Abschnitt \ref{sec:architektur} die gewählte Architektur und Umsetzung.
 Daraufhin legt Abschnitt \ref{sec:funktion} die genaue Funktion der Anwendung im Detail dar.
-Abschnitt \ref{sec:fazit} legt abschließend ein Fazit dar.
+Abschnitt \ref{sec:fazit} präsentiert abschließend ein Fazit.
 
 \section{Use Case}\label{sec:use-case}
 
-Das originale Setup stellt eine Reihe von Artikeln über einen Web-Server bereit, zeichnet Seitenaufrufe auf und schreibt sie in Kafka, von wo sie ein Spark Job aufnimmt und aggregiert, um Popularitätsstatistiken zu erstellen, welche wiederum auf der Web-Seite angezeigt werden.
+Das originale Setup stellt eine Reihe von Artikeln über einen Web-Server bereit, zeichnet Seitenaufrufe auf und schreibt sie in Kafka.
+Von dort werden sie von einem Spark Job gelesen und aggregiert, um Popularitätsstatistiken zu erstellen, die wiederum auf der Web-Seite angezeigt werden.
 Der Use Case befasst sich also mit einer simplen Analyse von Nutzerverhalten.
 
 \subsection{Brainstorming}
@@ -26,22 +27,23 @@ Mein erster Gedanke war, in bei der Nutzeranalyse zu bleiben und eine andere For
 Da ich in meiner Arbeit als Entwickler bei der SAP im Bereich Standardsoftware für den Einkauf mit internen Bestellplatformen zu tun habe, überlegte ich eine simple Warenkorbanalyse mittels des \enquote{Apriori} Algorithmus zu implementieren.
 \parencite{agrawal_fast_1994}
 
-Hierzu würde ich einen simplen Web-Shop implementieren, welcher dem Nutzer einen Katalog von Produkten anzeigt, welche dieser in seinen Warenkorb legen und bestellen kann.
-Die Bestellungen mitsamt der Positionen würden in Kafka geschrieben werden, wo ein Spark Job den Apriori Algorithmus anwendet, um Tupel von häufig zusammen gekauften Produkten zu identifizieren.
+Hierzu würde ich einen simplen Web-Shop implementieren, der dem Nutzer einen Katalog von Produkten anzeigt, welche dieser in seinen Warenkorb legen und bestellen kann.
+Die Bestellungen mitsamt der Positionen würden als Nachrichten in Kafka geschrieben werden.
+Ein Spark Job würde auf diesen Daten den Apriori Algorithmus anwenden, um Tupel von häufig zusammen gekauften Produkten zu identifizieren.
 Diese Information würde der Spark Job in eine MariaDB Datenbank persistieren, wo sie von der Web-App abgefragt werden könnte, um dem Nutzer einen Vorschlag wie \enquote{Kunden kauften ebenfalls:  \ldots} anzuzeigen, wie man ihn von den Webseiten von vielen großen Online-Händlern kennt.
 
-Letzenendes habe ich mich dagegen entschieden diesen Use Case so zu implementieren, weil mir der notwendige Aufwand als schwierig abzuschätzen und tendenziell groß erschien.
+Letzenendes habe ich mich dagegen entschieden diesen Use Case zu implementieren, weil mir der notwendige Aufwand als schwierig abzuschätzen und tendenziell groß erschien.
 Die Implementierung des Web-Shops mit nicht-existenten Kenntnissen in der Web-Entwicklung, sowie die nicht trivial erscheinende Implementierung des Apriori Algorithmus in Spark waren dabei ausschlaggebend.
-Aus diesem Grund habe ich mich nach einem Use Case umgeschaut, welcher in einem kleineren Rahmen umzusetzen sei.
+Aus diesem Grund habe ich mich nach einem Use Case umgeschaut, welcher in einem kleineren Rahmen umzusetzen ist.
 
 \subsubsection{Analyse der Parksituation in Heidelberg}
 
-Anschließend überlegte ich die Parksituation in meiner aktuellen Heimatstadt Heidelberg zu analysieren.
+Anschließend überlegte ich die Parksituation in meinem Wohnort Heidelberg zu analysieren.
 Die größte Herausforderung dabei schien mir, geeignete Daten zu finden.
 Unter \url{https://parken.heidelberg.de/} bietet die Stadt Heidelberg bereits eine digitale Übersicht der aktuellen Parksituation an, woraus sich schließen lässt, dass diese Daten nicht nur bereits gesammelt und analysiert werden, sondern auch über das Internet zugreifbar sind.
 
 Leider stellte sich bei einer oberflächlichen Analyse der Webseite heraus, dass die zugrundeliegende Daten-API nicht ohne Weiteres über andere Wege zugreifbar ist.
-Während sich mit hoher Wahrscheinlichkeit ein Weg finden ließe, die API dennoch programmatisch auszulesen, so wollte ich die damit einhergehende Unsicherheit und den möglichen Aufwand für das Schreiben eines Clients/Crawlers für die API vermeiden.
+Während sich mit hoher Wahrscheinlichkeit ein Weg finden ließe, die API dennoch programmatisch auszulesen, so wollte ich die damit einhergehende Unsicherheit und den möglichen Aufwand für das Schreiben eines Clients/Crawlers vermeiden.
 Daher habe ich auch diese Option verworfen.
 
 \subsection{Analyse von Messwerten zur Überwachung von Industriemaschinen}
@@ -49,7 +51,7 @@ Daher habe ich auch diese Option verworfen.
 Als drittes habe ich mich mit einem weiteren Umfeld auseinandergesetzt, in dem Big Data seit längerem eine große Rolle spielt: Predictive Maintenance.
 \citeauthor{hashemian_state---art_2011} beschreibt moderne Predictive Maintenance wie folgt: \enquote{[A]utomated methods that use advanced signal processing techniques based on pattern recognition, including neural networks, fuzzy logic, and data-driven empirical and physical modeling.} \parencite{hashemian_state---art_2011}
 
-Hier ließen sich verschiedene frei verfügbare Datensätze finden, welche als Basis für die Implementierung einer Big Data Anwendung dienen konnten.
+Hier ließen sich verschiedene, frei verfügbare Datensätze finden, die als Basis zur Implementierung einer Big Data Anwendung dienen konnten.
 Ich bin schließlich auf einen Datensatz der ZeMA gGmbH gestoßen, welcher im Rahmen von \cite{helwig_condition_2015} erstellt wurde und Daten von verschiedenen Sensoren eines hydraulischen Test-Systems enthält, die über mehrere Betriebszyklen hinweg aufgezeichnet wurden.\footnote{\url{https://archive.ics.uci.edu/ml/datasets/Condition+monitoring+of+hydraulic+systems}}
 
 \begin{figure}[H]
@@ -69,7 +71,7 @@ Da gemäß der Aufgabenstellung die existierende Anwendung angepasst werden soll
 Ohnehin erscheint mir für den gewählten Use Case die Kappa-Architektur sinnvoller als die Lambda-Architektur, da getrennte Batch und Speed Layer die Anwendung unnötig verkomplizieren würden.
 
 Abbildung \ref{fig:architektur} zeigt die Architektur der implementierten Big Data Anwendung und eine vereinfachte Darstellung des Datenflusses zwischen den Komponenten, um ihr Zusammenspiel abzubilden.
-Der Big Data Stack ist im Hinblick auf die verwendeten Produkte identisch mit der vorgegebenen Anwendung.
+Der Big Data Stack ist im Hinblick auf die verwendeten Produkte identisch mit der ursprünglichen Anwendung.
 Apache Kafka dient als Streaming Plattform, während ein Apache Hadoop Cluster mitsamt YARN ein HDFS als Data Lake und Apache Spark als Stream Processor bereitstellt.
 
 \begin{figure}[H]
@@ -78,21 +80,22 @@ Apache Kafka dient als Streaming Plattform, während ein Apache Hadoop Cluster m
   \caption{Architektur der implementierten Big Data Anwendung}\label{fig:architektur}
 \end{figure}
 
-Im proprietären Teil der Anwendung finden sich mehrere Instanzen eine NodeJS Web-App, welche Nutzern eine API bereitstellt.
-Diese App verwendet einen Memcached als Soft State zur, um Ergebnisse von Datenbankabfragen für kurze Zeit zu zwischenzuspeichern und somit selbst bei hoher Last Anfragen mit niedrigen Latenzen bearbeiten zu können.
+Im proprietären Teil der Anwendung finden sich mehrere Instanzen einer NodeJS Web-App, welche Nutzern eine API bereitstellt.
+Diese App verwendet einen Memcached als Soft State, um Ergebnisse von Datenbankabfragen für kurze Zeit zwischenzuspeichern und somit selbst bei hoher Last Anfragen mit niedrigen Latenzen bearbeiten zu können.
 Zur Persistenz nutzt die App eine MariaDB Instanz.
 Diese wird---im Kontrast mit der ursprünglichen Anwendung---exklusiv von der Web-App verwendet und nicht ebenfalls von der Spark Anwendung.
 
 Anstatt sowohl die Web-App als auch Spark an die Datenbank zu koppeln, schreibt Spark die Ergebnisse seiner Analysen in Kafka zurück.
 Diese Nachrichten werden von der Web-App konsumiert und in die Datenbank geschrieben.
-Dadurch sind die Komponenten nur gegen Kafka gekoppelt und die Datenhaltung der Web-App stellt nur ein materialisiertes Abbild der Daten in Kafka dar, welches zum Beispiel nach einem Ausfall, oder nach Beheben eines Programmfehlers, einfach weggeworfen und neu gebildet werden kann.
+Dadurch sind die Komponenten nur gegen Kafka gekoppelt und die Datenhaltung der Web-App stellt nur ein materialisiertes Abbild der Daten in Kafka dar.
+Dieses Abbild kann zum Beispiel nach einem Ausfall, oder nach Beheben eines Programmfehlers, einfach weggeworfen und neu gebildet werden.
 
 Wie auch in der ursprünglichen Anwendung, werden alle Teil-Komponenten dieser Anwendung in einem Kubernetes Cluster bereitgestellt.
 Dieses stellt zudem den Load Balancer, welcher die Web-App für Nutzer zugreifbar macht, und die Anfragen über die verschiedenen Instanzen der App verteilt.
 
 Als letzte zu nennende Komponente stellt der Simulator ebenfalls eine Abkehr von dem Modell des Use Case in Abbildung \ref{fig:use-case} dar.
 Um Sensordaten in die Big Data Anwendung zu bringen, sieht der Use Case eine dedizierte Komponente vor.
-Konkret könnte dies ein MQTT-Gateway sein, das es MQTT-Clients erlaubt Nachrichten mit Messwerten über das bei IoT-Devices beliebte Protokoll an die Anwendung zu senden.
+Konkret könnte dies ein MQTT-Gateway sein, das es Clients erlaubt Nachrichten mit Messwerten über das bei IoT-Devices beliebte Protokoll an die Anwendung zu senden.
 Diese Nachrichten könnten dann in den Kafka gespeist und von Spark verarbeitet werden.
 
 Im Laufe der Laborarbeit habe ich mich jedoch zunächst für einen pragmatischeren Ansatz entschieden.
@@ -127,7 +130,7 @@ Die Ergebnisse der dafür notwendigen Datenbankabfragen werden in den Memcached 
 
 \section{Fazit}\label{sec:fazit}
 
-Die vorgestellte Laborarbeit wandelt die gegebene Anwendung gemäß der Aufgabenstellung ab, um einen unteschiedlichen Big Data Use Case zu implementieren.
+Die vorgestellte Laborarbeit wandelt die gegebene Anwendung gemäß der Aufgabenstellung ab, um einen andersartigen Big Data Use Case zu implementieren.
 Hierbei widmet sich die entwickelte Anwendung der Analyse von Messwerten von simulierten Temperatursensoren.
 Die Analyse beschränkt sich darauf zu prüfen ob die Messwerte einen festen Grenzwert überschreiten.
 Ist dies der Fall, wird diese Information über Kafka an eine Web-App kommuniziert, welche diese persistiert und über eine API bereitstellt.
@@ -135,7 +138,7 @@ Im Gegensatz zu der ursprünglichen Anwendung, wird die Datenbank exklusiv von d
 Die Spark und Web Apps integrieren ausschließlich über Kafka.
 
 Es präsentieren sich zwei offensichtliche Möglichkeiten zur Weiterentwicklung.
-Erstens, könnte die Simulator App durch ein MQTT Gateway ersetzt werden, wodurch die Architektur den Anforderungen eines realistischeren Form des Use Case besser gerecht werden könnte.
+Erstens, könnte die Simulator App durch ein MQTT Gateway ersetzt werden, wodurch die Architektur den Anforderungen einer realistischeren Form des Use Case besser gerecht werden könnte.
 Zur Veranschaulichung der Funktionalität, könnten schlanke MQTT Clients entwickelt werden, die anstatt Werte zu generieren, Werte aus dem Datensatz von \cite{helwig_condition_2015} über das Gateway in die Anwendung spielen.
 
 Zweitens, ist die Analyse in Spark in der vorliegenden Form wenig \textit{predictive}.
