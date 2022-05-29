@@ -118,4 +118,8 @@ Das Listing \ref{lst:temperature-warning-message} zeigt ein Beispiel für den In
   \caption{Beispielinhalt einer Kafka-Nachricht mit Warnung vor zu hohem Temperaturwert}\label{lst:temperature-warning-message}
 \end{listing}
 
+Diese Nachrichten mit Warnungen über Messwerte, welche die bestimmten Grenzwerte überschreiten, werden wiederum von der Web-App konsumiert und in der Datenbank persistiert.
+Über den API-Endpunkt \path{/warnings} können alle gespeicherten Warnungen abgefragt werden, während der Endpunkt \path{/warnings/:is} es erlaubt eine bestimmte Warnung abzufragen.
+Die Ergebnisse der dafür notwendigen Datenbankabfragen werden in den Memcached Instanzen für fünf Sekunden zwischengespeichert.
+
 \section{Fazit}\label{sec:fazit}
