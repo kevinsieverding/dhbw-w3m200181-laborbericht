@@ -62,10 +62,60 @@ Persistierte Ergebnisse können anschließend Nutzern zur Verfügung gestellt we
 
 \section{Architektur}\label{sec:architektur}
 
+Da gemäß der Aufgabenstellung die existierende Anwendung angepasst werden sollte, und diese bereits der Kappa-Architektur folgt, so tut dies auch die von mir gestaltete Anwendung.
+Ohnehin erscheint mir für den gewählten Use Case die Kappa-Architektur sinnvoller als die Lambda-Architektur, da getrennte Batch und Speed Layer die Anwendung unnötig verkomplizieren würden.
+
+Abbildung \ref{fig:architektur} zeigt die Architektur der implementierten Big Data Anwendung und eine vereinfachte Darstellung des Datenflusses zwischen den Komponenten, um ihr Zusammenspiel abzubilden.
+Der Big Data Stack ist im Hinblick auf die verwendeten Produkte identisch mit der vorgegebenen Anwendung.
+Apache Kafka dient als Streaming Plattform, während ein Apache Hadoop Cluster mitsamt YARN ein HDFS als Data Lake und Apache Spark als Stream Processor bereitstellt.
+
 \begin{figure}[H]
   \centering
   \includegraphics[width=0.9\textwidth]{architecture.drawio.png}
   \caption{Architektur der implementierten Big Data Anwendung}\label{fig:architektur}
 \end{figure}
+
+Im proprietären Teil der Anwendung finden sich mehrere Instanzen eine NodeJS Web-App, welche Nutzern eine API bereitstellt.
+Diese App verwendet einen Memcached als Soft State zur, um Ergebnisse von Datenbankabfragen für kurze Zeit zu zwischenzuspeichern und somit selbst bei hoher Last Anfragen mit niedrigen Latenzen bearbeiten zu können.
+Zur Persistenz nutzt die App eine MariaDB Instanz.
+Diese wird---im Kontrast mit der ursprünglichen Anwendung---exklusiv von der Web-App verwendet und nicht ebenfalls von der Spark Anwendung.
+
+Anstatt sowohl die Web-App als auch Spark an die Datenbank zu koppeln, schreibt Spark die Ergebnisse seiner Analysen in Kafka zurück.
+Diese Nachrichten werden von der Web-App konsumiert und in die Datenbank geschrieben.
+Dadurch sind die Komponenten nur gegen Kafka gekoppelt und die Datenhaltung der Web-App stellt nur ein materialisiertes Abbild der Daten in Kafka dar, welches zum Beispiel nach einem Ausfall, oder nach Beheben eines Programmfehlers, einfach weggeworfen und neu gebildet werden kann.
+
+Wie auch in der ursprünglichen Anwendung, werden alle Teil-Komponenten dieser Anwendung in einem Kubernetes Cluster bereitgestellt.
+Dieses stellt zudem den Load Balancer, welcher die Web-App für Nutzer zugreifbar macht, und die Anfragen über die verschiedenen Instanzen der App verteilt.
+
+Als letzte zu nennende Komponente stellt der Simulator ebenfalls eine Abkehr von dem Modell des Use Case in Abbildung \ref{fig:use-case} dar.
+Um Sensordaten in die Big Data Anwendung zu bringen, sieht der Use Case eine dedizierte Komponente vor.
+Konkret könnte dies ein MQTT-Gateway sein, das es MQTT-Clients erlaubt Nachrichten mit Messwerten über das bei IoT-Devices beliebte Protokoll an die Anwendung zu senden.
+Diese Nachrichten könnten dann in den Kafka gespeist und von Spark verarbeitet werden.
+
+Im Laufe der Laborarbeit habe ich mich jedoch zunächst für einen pragmatischeren Ansatz entschieden.
+Nämlich, eine Komponente einzubauen, welche ein solches Gateway simuliert, indem es Nachrichten mit pseudo-zufälligen Werten in Kafka schreibt.
+
+\section{Funktion}\label{sec:funktion}
+
+Konkret generiert der Simulator im Sekundentakt Temperaturwerte zwischen 30~°C und 80~°C---in Anlehnung an den Datensatz von \cite{helwig_condition_2015}.
+Damit diese Werte nicht zu unrealistisch sind, werden sie im Wertebereich normalverteilt generiert.
+Die App schreibt die Werte im JSON Format auf das Kafka Topic \path{de.kevinsieverding.supervizor.temperature}.
+Das Listing \ref{lst:temperature-message} zeigt ein Beispiel für den Inhalt einer solchen Nachricht.
+
+\begin{listing}[H]
+  \inputminted{json}{assets/src/temperature-message.json}
+  \caption{Beispielinhalt einer Kafka-Nachricht mit generiertem Temperaturwert}\label{lst:temperature-message}
+\end{listing}
+
+Diese Nachrichten werden von Spark aufgegriffen und mittels Microbatching in 30 Sekunden langen, rollenden Zeitfenstern verarbeitet.
+Bei der Verarbeitung werden die Werte in die Zeitfenster gruppiert und nur der maximale Temperaturwert innerhalb des Fensters behalten.
+Liegt dieser Wert über dem Grenzwert von 66 °C, so schreibt Spark eine Nachricht auf das Topic \path{de.kevinsieverding.supervizor.temperature-warnings}.
+Diese enthält die Start- und End-Zeitpunkte des Zeitfensters, sowie den Temperaturwert.
+Das Listing \ref{lst:temperature-warning-message} zeigt ein Beispiel für den Inhalt einer solchen Nachricht.
+
+\begin{listing}[H]
+  \inputminted{json}{assets/src/temperature-warning-message.json}
+  \caption{Beispielinhalt einer Kafka-Nachricht mit Warnung vor zu hohem Temperaturwert}\label{lst:temperature-warning-message}
+\end{listing}
 
 \section{Fazit}\label{sec:fazit}
